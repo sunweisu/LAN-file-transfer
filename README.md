@@ -9,7 +9,7 @@ git clone https://github.com/sunweisu/LAN-file-transfer.git
 局域网内的人可以通过输出的连接/扫描生成的二维码即可上传下载文件
 
 如果需要限制文件大小上传可以添加代码：
-
+```python
 # 设置最大文件大小为 1MB
 
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
@@ -27,3 +27,4 @@ def upload_file():
 
     # 如果文件大小超过限制，将触发一个 413 错误
     return abort(413, description="File size exceeds the limit")
+```
