@@ -8,23 +8,27 @@ git clone https://github.com/sunweisu/LAN-file-transfer.git
 运行run.py即可
 局域网内的人可以通过输出的连接/扫描生成的二维码即可上传下载文件
 
-如果需要限制文件大小上传可以在run.py中的app = Flask(__name__)下面添加代码：
+如果需要限制文件大小上传可以在run.py中的app = Flask(name_)下面添加代码：
+
 ```python
-# 设置最大文件大小为 1MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 限制上传文件大小为16MB
+```
 
-app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
+如果需要限制文件类型上传可以在run.py中的app = Flask(name)下面添加代码：
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return 'No file part', 400
-    file = request.files['file']
-    if file.filename == '':
-        return 'No selected file', 400
-    if file:
-        # 这里可以添加处理文件的代码
-        return 'File successfully uploaded', 200
+```python
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}  # 允许上传的文件类型
 
-    # 如果文件大小超过限制，将触发一个 413 错误
-    return abort(413, description="File size exceeds the limit")
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+```
+
+然后在upload()函数中添加代码：
+
+
+```python
+if not allowed_file(file.filename):
+    flash('不允许上传该类型的文件')
+    return redirect(request.url)
 ```
