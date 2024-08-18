@@ -11,6 +11,7 @@ git clone https://github.com/sunweisu/LAN-file-transfer.git
 如果需要限制文件大小上传可以添加代码：
 
 # 设置最大文件大小为 1MB
+
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024
 
 @app.route('/upload', methods=['POST'])
