@@ -8,7 +8,7 @@ git clone https://github.com/sunweisu/LAN-file-transfer.git
 运行run.py即可
 局域网内的人可以通过输出的连接/扫描生成的二维码即可上传下载文件
 
-如果需要限制文件大小上传可以添加代码：
+如果需要限制文件大小上传可以在run.py中的app = Flask(__name__)下面添加代码：
 ```python
 # 设置最大文件大小为 1MB
 
