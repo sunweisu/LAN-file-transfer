@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件传输页面</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* 默认背景图片（用于桌面） */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* 防止横向滚动条 */
+            background-image: url('https://s2.loli.net/2024/08/16/PoYAIHT8XzgUjVm.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* 背景固定 */
+        }
+
+        body {
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding-top: 120px; /* 调整 padding-top 值 */
+        }
+
+        header {
+            display: flex;
+            align-items: center; /* 垂直居中 Logo 和标题 */
+            justify-content: flex-start; /* 将 Logo 和标题对齐到左边 */
+            padding: 20px 40px; /* 调整 padding */
+            background: transparent; /* 去掉背景色 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0); /* 去掉阴影 */
+            border-bottom: none; /* 去掉底部黑线 */
+            height: 150px; /* 调整 header 高度 */
+        }
+
+        #logo {
+            height: 150px; /* 调整 Logo 的高度 */
+            width: auto;  /* 保持比例 */
+            margin-right: 20px; /* Logo 和标题之间的间距 */
+        }
+
+        h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.5em;
+            text-align: left; /* 标题左对齐 */
+        }
+
+        /* 使内容区域在 Logo 下方并靠左对齐 */
+        #content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* 内容左对齐 */
+            padding: 20px;
+            color: #fff;
+            text-align: left; /* 内容左对齐 */
+            margin-left: 20px; /* 与左侧边距对齐 */
+        }
+
+        #file-list {
+            margin-bottom: 20px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        .overlay-content {
+            display: inline-block;
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .progress-bar-container {
+            background: #444;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            width: 100%;
+            height: 20px;
+        }
+
+        #progress-bar {
+            background: #76c7c0;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: #76c7c0;
+            border: none;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #65a8a6;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            html, body {
+                background-image: url('https://s2.loli.net/2024/08/17/bfZWLdE8RGqgYVp.jpg'); /* 手机背景图片 */
+                background-attachment: fixed; /* 背景随页面滚动 */
+            }
+
+            header {
+                padding: 10px; /* 在小屏幕上减少 padding */
+                height: auto; /* 自适应高度 */
+                box-shadow: none; /* 去掉阴影 */
+            }
+
+            #logo {
+                height: 80px; /* 调整 Logo 高度 */
+            }
+
+            h1 {
+                font-size: 1.2em; /* 调整标题大小 */
+            }
+
+            #content {
+                padding: 10px;
+                margin-left: 0; /* 去掉左边距 */
+                text-align: center; /* 中心对齐内容 */
+            }
+
+            #file-list {
+                margin-bottom: 10px; /* 减少底部间距 */
+            }
+
+            input[type="file"] {
+                width: 100%; /* 输入框宽度100% */
+                margin-bottom: 15px; /* 增加底部间距 */
+            }
+
+            button {
+                width: 100%; /* 按钮宽度100% */
+                padding: 15px; /* 增加 padding */
+                font-size: 1.1em; /* 增加字体大小 */
+            }
+
+            .overlay-content {
+                padding: 10px; /* 减少 padding */
+            }
+
+            .progress-bar-container {
+                height: 15px; /* 减少进度条高度 */
+            }
+
+            #progress-bar {
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="https://s2.loli.net/2024/08/17/PhertXdzYC34ONm.png" alt="Logo" id="logo">
+        <h1>文件传输页面</h1>
+    </header>
+
+    <div id="content">
+        <h2>文件列表</h2>
+        <div id="file-list"></div>
+
+        <h2>上传文件</h2>
+        <input type="file" id="file-upload" multiple />
+        <button id="upload-button">上传</button>
+    </div>
+
+    <div id="overlay">
+        <div class="overlay-content">
+            <p>正在上传的文件</p>
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showOverlay() {
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function hideOverlay() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function listFiles() {
+            $.ajax({
+                url: '/list',
+                type: 'GET',
+                success: function (files) {
+                    var fileList = files;
+                    var filesHtml = fileList.map(function (file) {
+                        var icon = 'fas fa-file';
+                        if (file.endsWith('.pdf')) icon = 'fas fa-file-pdf';
+                        if (file.endsWith('.docx')) icon = 'fas fa-file-word';
+                        if (file.endsWith('.xlsx')) icon = 'fas fa-file-excel';
+                        if (file.endsWith('.jpg') || file.endsWith('.png')) icon = 'fas fa-file-image';
+                        if (file.endsWith('.txt')) icon = 'fas fa-file-alt'; // 文本文件图标
+                        if (file.endsWith('.zip')) icon = 'fas fa-file-archive'; // 压缩文件图标
+                        if (file.endsWith('.csv')) icon = 'fas fa-file-csv'; // CSV 文件图标
+                        return '<div><i class="' + icon + '"></i><a href="/download/' + encodeURIComponent(file) + '">' + file + '</a></div>';
+                    }).join('');
+                    $('#file-list').html(filesHtml);
+                },
+                error: function () {
+                    alert('无法获取文件列表');
+                }
+            });
+        }
+
+        function updateProgressBar(uploadCount, totalFiles) {
+            var percentComplete = (uploadCount / totalFiles) * 100;
+            document.getElementById('progress-bar').style.width = percentComplete + '%';
+        }
+
+        function uploadFile() {
+            showOverlay();
+            var fileInput = document.getElementById('file-upload');
+            var files = fileInput.files;
+            var totalFiles = files.length;
+            var uploadCount = 0;
+
+            if (totalFiles === 0) {
+                alert('请选择文件');
+                hideOverlay();
+                return;
+            }
+
+            for (var i = 0; i < files.length; i++) {
+                var formData = new FormData();
+                formData.append('file', files[i]);
+
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        console.log('成功:', data);
+                    },
+                    error: function (xhr) {
+                        console.error('错误:', xhr.responseText);
+                    },
+                    complete: function () {
+                        updateProgressBar(++uploadCount, totalFiles);
+                        if (uploadCount === totalFiles) {
+                            alert('所有文件上传成功');
+                            listFiles();
+                            hideOverlay();
+                        }
+                    }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            listFiles();
+            $('#upload-button').on('click', uploadFile);
+        });
+    </script>
+</body>
+
+</html>
