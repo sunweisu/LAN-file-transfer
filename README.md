@@ -6,4 +6,4 @@ git clone https://github.com/sunweisu/LAN-file-transfer.git
 然后修改index.html里面的电脑背景图片手机背景与logo图片为自己的
 然后下载对应的python包
 运行run.py即可
-通过打开输出的连接即可上传文件
+局域网内的人可以通过输出的连接/扫描生成的二维码即可上传下载文件
